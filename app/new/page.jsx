@@ -6,8 +6,9 @@ import { firestore, storage } from '@/firebase';
 import { uploadBytes, getDownloadURL, ref } from 'firebase/storage';
 import { addDoc, collection } from 'firebase/firestore';
 import {v4 as uuidv4} from 'uuid';
-import { useRouter } from 'next/navigation';
 
+import { useRouter } from 'next/navigation';
+import { useAuth } from "../store/useAuth";
 
 
 
@@ -17,6 +18,7 @@ export default function New() {
   const [url, setUrl] = useState("");
   const [value, setValue] = useState();
   const router = useRouter();
+  const { user } = useAuth();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -30,8 +32,8 @@ export default function New() {
               bg-contain mr-2`}
             />
             <div>
-              <div className="font-semibold">{"작성자"}</div>
-              <div className="font-light">{"위치"}</div>
+              <div className="font-semibold">{user.name}</div>
+              <div className="font-light">위치</div>
             </div>
           </div>
           {/* 더보기 버튼 */}
@@ -54,11 +56,16 @@ export default function New() {
                 type="file" 
                 style={{display:"none"}} 
                 onChange={async (e) => {
-                  const file = e.target.files[0];
-                  const generatedId = uuidv4();
-                  await uploadBytes(ref(storage, generatedId), file);
-                  const url = await getDownloadURL(ref(storage, generatedId));
-                  setUrl(url);
+                  try {
+                    const file = e.target.files[0];
+                    const generatedId = uuidv4();
+                    await uploadBytes(ref(storage, generatedId), file);
+                    const url = await getDownloadURL(ref(storage,   generatedId));
+                    setUrl(url);
+                  } catch (error) {
+                    console.error(error);
+                  }
+                  
                 }} 
               />
               <label htmlFor="file-upload" className='cursor-pointer'>
@@ -81,10 +88,10 @@ export default function New() {
         onClick={async () => {
           try {
             const docRef = await addDoc(collection(firestore, 'feeds'), {
-              id: 'xxxx',
+              id: uuidv4(),
               author: {
-                id: 'asdfsagdfsg',
-                name: 'Han',
+                id: user.id,
+                name: user.name,
                 profileImg: 'https://cdn-icons-png.flaticon.com/512/1361/1361876.png'
               },
               location: 'seoul',
