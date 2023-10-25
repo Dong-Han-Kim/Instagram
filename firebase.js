@@ -3,6 +3,7 @@
 import { initializeApp } from "firebase/app";
 import { getStorage } from 'firebase/storage';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -32,3 +33,5 @@ const app = initializeApp(firebaseConfig);
 export const firestore = getFirestore(app);
 // 이미지만을 저장하기 위한 저장소
 export const storage = getStorage(app);
+/** 로그인을 관리하기 위한 도구 */
+export const auth = getAuth(app);

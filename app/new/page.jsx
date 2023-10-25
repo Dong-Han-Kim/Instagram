@@ -10,7 +10,7 @@ import {v4 as uuidv4} from 'uuid';
 import { useRouter } from 'next/navigation';
 import { useAuth } from "../store/useAuth";
 
-
+import Link from 'next/link';
 
 
 export default function New() {
@@ -20,17 +20,28 @@ export default function New() {
   const router = useRouter();
   const { user } = useAuth();
 
+  if (!user)
+    return (
+      <div>
+        <Link href={"/auth"}> 로그인 </Link>을 해주세요
+      </div>
+    );
+
+  console.log({ profile: user.profileImg });
+
+  const backgroundImage =
+    user.profileImg ||
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="w-[400px] bg-white mb-1">
         <div id="header" className="flex items-center justify-between p-2">
           {/* profile */}
           <div className="flex items-center">
-            <div
-              className={`rounded-full w-10 h-10
-              bg-[url('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png')]
-              bg-contain mr-2`}
-            />
+            <div className={`rounded-full w-10 h-10 bg-contain mr-2`}>
+              <img className={`rounded-full w-10 h-10`} src={backgroundImage} />
+            </div>
             <div>
               <div className="font-semibold">{user.name}</div>
               <div className="font-light">위치</div>
@@ -89,11 +100,7 @@ export default function New() {
           try {
             const docRef = await addDoc(collection(firestore, 'feeds'), {
               id: uuidv4(),
-              author: {
-                id: user.id,
-                name: user.name,
-                profileImg: 'https://cdn-icons-png.flaticon.com/512/1361/1361876.png'
-              },
+              author: user,
               location: 'seoul',
               image: url,
               text: value,

@@ -1,11 +1,11 @@
 "use client";
 
 import { addDoc, collection, where, getDocs, query } from 'firebase/firestore';
-import { useState } from 'react'
-import { firestore } from 'firebase/firestore';
+import { useState } from 'react';
+import { auth, firestore } from './../../firebase';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../store/useAuth';
-
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 
 export default function Auth (){
@@ -16,10 +16,23 @@ export default function Auth (){
   const { signIn } = useAuth();
   const router = useRouter();
 
-  const { user } = useAuth();
-  console.log({ user })
+  const handleGoogleLoginButtonClick = async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const { user } = result;
+    const newUser = {
+      id: user.uid,
+      name: user.email.split("@")[0],
+      profileImg: user.photoURL,
+    };
+    signIn(newUser);
+    localStorage.setItem("user", JSON.stringify(newUser));
+    router.push("/");
+  };
+
   return (
     <main className='flex min-h-screen flex-col items-center justify-between p-24'>
+      <button onClick={handleGoogleLoginButtonClick}>구글 로그인</button>
       <div>
         <label>name : </label>
         <input value={id} onChange={(e) => setId(e.target.value)} />
