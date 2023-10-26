@@ -1,11 +1,11 @@
 "use client";
-
-import { addDoc, collection, where, getDocs, query } from 'firebase/firestore';
+import { v4 as uuidv4 } from "uuid";
 import { useState } from 'react';
+import { setDoc, doc, collection, where, getDocs, query } from '@firebase/firestore';
 import { auth, firestore } from './../../firebase';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../store/useAuth';
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useAuth } from '../../store/useAuth';
 
 
 export default function Auth (){
@@ -51,7 +51,7 @@ export default function Auth (){
         onClick={async () => {
           if (isLoginMode){
             const storedUser = await getDocs(
-              query(collection(firstore, "users"), where("name", "==", id))
+              query(collection(firestore, "users"), where("name", "==", id))
             );
             const targetUsers = [];
             storedUser.forEach((doc) => targetUsers.push(doc.data()));
@@ -91,13 +91,13 @@ export default function Auth (){
             );
             return;
           }
-          
+          const docId = uuidv4();
           const newUser = {
-            id: uuidv4(),
+            id: docId,
             name: id,
             pw,
           };
-          await addDoc(collection(firestore, "users"), newUser);
+          await setDoc(doc(firestore, "users", docId), newUser);
           localStorage.setItem("user", JSON.stringify(newUser));
           signIn(useUser);
           window.alert("회원가입에 완료했습니다");

@@ -1,17 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from 'react';
-import { Photo } from '../icons/icons';
-import { firestore, storage } from '@/firebase';
-import { uploadBytes, getDownloadURL, ref } from 'firebase/storage';
-import { addDoc, collection } from 'firebase/firestore';
-import {v4 as uuidv4} from 'uuid';
+import { useState } from "react";
+import { Photo } from "../../components/icons/icons";
+import { storage } from "../../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
-import { useRouter } from 'next/navigation';
-import { useAuth } from "../store/useAuth";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../store/useAuth";
 
-import Link from 'next/link';
+import Link from "next/link";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import { useContents } from "../../store/useContents";
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export default function New() {
   // 새로운 feed를 생성
@@ -19,6 +24,7 @@ export default function New() {
   const [value, setValue] = useState();
   const router = useRouter();
   const { user } = useAuth();
+  const { createContent } = useContents();
 
   if (!user)
     return (
@@ -27,8 +33,7 @@ export default function New() {
       </div>
     );
 
-  console.log({ profile: user.profileImg });
-
+  const location = dayjs.tz.guess().split("/")[1];
   const backgroundImage =
     user.profileImg ||
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
@@ -44,7 +49,7 @@ export default function New() {
             </div>
             <div>
               <div className="font-semibold">{user.name}</div>
-              <div className="font-light">위치</div>
+              <div className="font-light">{location}</div>
             </div>
           </div>
           {/* 더보기 버튼 */}
@@ -98,15 +103,7 @@ export default function New() {
         className='fixed bottom-10 left-0 right-0 mx-auto w-16 h-16 bg-[url(https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Instagram-Icon.png/768px-Instagram-Icon.png)] bg-cover shadow-xl'
         onClick={async () => {
           try {
-            const docRef = await addDoc(collection(firestore, 'feeds'), {
-              id: uuidv4(),
-              author: user,
-              location: 'seoul',
-              image: url,
-              text: value,
-              liked: [],
-            });
-            console.log(docRef);
+            await createContent({ location, image: url, text: value });
             router.push('/');
           } catch (error){
             console.log(error);

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "../store/useAuth";
 import { useRouter } from "next/navigation";
 
 export const Authentication = () => {
-  const { user, signIn, signOut } = useAuth();
+  const { user, signIn, signOut, subscribeAlarm } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -13,6 +13,12 @@ export const Authentication = () => {
     if (!loggedInUser) return;
     signIn(loggedInUser);
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsubscribe = subscribeAlarm(router);
+    return () => unsubscribe();
+  }, [user]);
 
   return (
     <>
