@@ -1,14 +1,21 @@
 "use client";
+
 import { v4 as uuidv4 } from "uuid";
-import { useState } from 'react';
-import { setDoc, doc, collection, where, getDocs, query } from '@firebase/firestore';
-import { auth, firestore } from './../../firebase';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import {
+  setDoc,
+  doc,
+  collection,
+  where,
+  getDocs,
+  query,
+} from "@firebase/firestore";
+import { auth, firestore } from "../../firebase";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../store/useAuth";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { useAuth } from '../../store/useAuth';
 
-
-export default function Auth (){
+export default function Auth() {
   const [isLoginMode, setLoginMode] = useState(true);
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
@@ -31,7 +38,7 @@ export default function Auth (){
   };
 
   return (
-    <main className='flex min-h-screen flex-col items-center justify-between p-24'>
+    <main className="flex min-h-screen flex-col items-center  p-24">
       <button onClick={handleGoogleLoginButtonClick}>구글 로그인</button>
       <div>
         <label>name : </label>
@@ -39,17 +46,25 @@ export default function Auth (){
       </div>
       <div>
         <label>PW : </label>
-        <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} />
+        <input
+          type="password"
+          value={pw}
+          onChange={(e) => setPw(e.target.value)}
+        />
       </div>
       {!isLoginMode && (
         <div>
           <label>PW confirm : </label>
-          <input type='password' value={pwConfirm} onChange={(e) => setPwConfirm(e.target.value)} />
+          <input
+            type="password"
+            value={pwConfirm}
+            onChange={(e) => setPwConfirm(e.target.value)}
+          />
         </div>
       )}
       <button
         onClick={async () => {
-          if (isLoginMode){
+          if (isLoginMode) {
             const storedUser = await getDocs(
               query(collection(firestore, "users"), where("name", "==", id))
             );
@@ -68,18 +83,22 @@ export default function Auth (){
               window.alert("비밀번호가 다릅니다.");
               return;
             }
+
             window.alert("로그인에 성공했습니다.");
             signIn(targetUser);
             localStorage.setItem("user", JSON.stringify(targetUser));
             router.push("/");
             return;
           }
+
+          // 회원가입 모드
+
+          // validation
           if (pw !== pwConfirm) {
             window.alert("두개의 비밀번호가 다릅니다");
             return;
           }
-          // 회원가입 모드 
-          // 검사하는 코드
+
           const storedUser = await getDocs(
             query(collection(firestore, "users"), where("name", "==", id))
           );
@@ -99,10 +118,10 @@ export default function Auth (){
           };
           await setDoc(doc(firestore, "users", docId), newUser);
           localStorage.setItem("user", JSON.stringify(newUser));
-          signIn(useUser);
+          signIn(newUser);
           window.alert("회원가입에 완료했습니다");
           router.push("/");
-          }}
+        }}
       >
         {isLoginMode ? "로그인" : "회원가입"}
       </button>
@@ -110,5 +129,5 @@ export default function Auth (){
         {isLoginMode ? "회원가입 하러가기" : "로그인 하러가기"}
       </button>
     </main>
-  )
+  );
 }

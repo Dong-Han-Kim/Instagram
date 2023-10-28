@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { where, query, collection, getDocs, setDoc, addDoc, doc, getDoc, onSnapshot, updateDoc } from "@firebase/firestore";
-import { firestore } from "@/firebase";
+import { where, query, collection, getDocs, setDoc, addDoc, doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { firestore } from "../firebase";
 import { toast } from "react-toastify";
 
 export const useAuth = create((set, get) => ({

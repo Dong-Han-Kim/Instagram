@@ -20,7 +20,7 @@ export default function Chat() {
   const params = useParams();
   const router = useRouter();
 
-  console.log(window.location.pathname);
+  // console.log(window.location.pathname);
   useEffect(() => {
     if (!params.id) return;
     fetchChatRoom();

@@ -1,12 +1,5 @@
 import { create } from "zustand";
-import {
-  where,
-  query,
-  collection,
-  getDocs,
-  setDoc,
-  doc,
-} from "@firebase/firestore";
+import { where, query, collection, getDocs, setDoc, doc } from "@firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { firestore } from "../firebase";
 import { useAuth } from "./useAuth";

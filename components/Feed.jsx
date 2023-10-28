@@ -6,8 +6,6 @@ import { doc, updateDoc, arrayRemove, arrayUnion } from "@firebase/firestore";
 import { useRouter } from "next/navigation";
 
 // User
-
-
 export const Feed = ({ 
   loggedInUser,
   content,

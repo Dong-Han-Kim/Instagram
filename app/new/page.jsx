@@ -106,7 +106,7 @@ export default function New() {
             await createContent({ location, image: url, text: value });
             router.push('/');
           } catch (error){
-            console.log(error);
+            console.error(error);
           }
         }}
       ></button>
